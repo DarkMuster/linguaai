@@ -6,6 +6,8 @@
 <title>LinguaAI — Language Courses</title>
 <meta name="description" content="CEFR A1-C2 language courses. Japanese, German, Spanish, French, Russian, Arabic, English.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+<!-- Supabase JS (auth + database) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -560,6 +562,145 @@ footer{
 .xpop{position:fixed;font-family:var(--fh);font-size:1rem;font-weight:700;color:var(--gold-l);pointer-events:none;z-index:3500;animation:xup .85s ease-out forwards}
 @keyframes xup{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-44px)}}
 @media(max-width:460px){.home-h{font-size:1.7rem}.ex-word{font-size:1.85rem}.ex-q{font-size:1.1rem}}
+
+/* ══════════════════════════════════════
+   AUTH SYSTEM — Sakura Classic
+══════════════════════════════════════ */
+.auth-modal-ov{position:fixed;inset:0;background:rgba(6,2,2,.88);backdrop-filter:blur(18px);z-index:3000;display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;pointer-events:none;transition:opacity .3s}
+.auth-modal-ov.open{opacity:1;pointer-events:all}
+.auth-box{
+  max-width:420px;width:100%;
+  background:linear-gradient(160deg,#1e0d14,#120808);
+  border:1px solid rgba(212,98,122,.28);border-radius:22px;
+  overflow:hidden;transform:scale(.94) translateY(18px);transition:transform .3s;
+  position:relative;
+}
+.auth-modal-ov.open .auth-box{transform:scale(1) translateY(0)}
+.auth-header{
+  padding:28px 28px 0;text-align:center;
+  background:linear-gradient(180deg,rgba(212,98,122,.06),transparent);
+  border-bottom:1px solid rgba(212,98,122,.1);
+}
+.auth-crest{font-size:2.8rem;margin-bottom:8px;display:block}
+.auth-title{font-family:'Noto Serif JP',serif;font-size:1.3rem;font-weight:700;color:var(--pk-l);margin-bottom:4px}
+.auth-sub{font-size:.78rem;color:var(--tq);margin-bottom:16px;line-height:1.55}
+/* Tabs */
+.auth-tabs{display:flex;border-top:1px solid rgba(212,98,122,.12);margin-top:2px}
+.auth-tab{
+  flex:1;padding:11px;text-align:center;cursor:pointer;
+  font-size:.84rem;font-weight:600;color:var(--tq);
+  transition:var(--t);border-bottom:2px solid transparent;
+  font-family:'Inter',sans-serif;background:none;border-left:none;border-right:none;border-top:none;
+}
+.auth-tab.active{color:var(--pk-l);border-bottom:2px solid var(--pk)}
+.auth-tab:hover:not(.active){color:var(--tm)}
+/* Form */
+.auth-body{padding:24px 28px 28px}
+.auth-panel{display:none}.auth-panel.active{display:block}
+.auth-field{margin-bottom:14px}
+.auth-label{display:block;font-size:.74rem;font-weight:700;color:var(--tq);margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'Inter',sans-serif}
+.auth-input{
+  width:100%;padding:12px 15px;
+  background:rgba(255,220,210,.045);
+  border:1.5px solid rgba(212,98,122,.18);
+  border-radius:10px;color:var(--tx);
+  font-family:'Inter',sans-serif;font-size:.92rem;
+  outline:none;transition:var(--t);
+}
+.auth-input:focus{border-color:var(--pk);background:rgba(212,98,122,.07);box-shadow:0 0 0 3px rgba(212,98,122,.1)}
+.auth-input::placeholder{color:var(--tq)}
+.auth-hint{font-size:.71rem;color:var(--tq);margin-top:5px;line-height:1.45}
+.auth-divider{height:1px;background:linear-gradient(to right,transparent,rgba(212,98,122,.15),transparent);margin:16px 0}
+.auth-btn{
+  width:100%;padding:14px;border-radius:12px;
+  background:linear-gradient(135deg,var(--pk),var(--pk-d));
+  color:#fff;font-size:.96rem;font-weight:700;
+  border:none;cursor:pointer;font-family:'Inter',sans-serif;
+  transition:var(--t);letter-spacing:.03em;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.auth-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 24px rgba(212,98,122,.38)}
+.auth-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.auth-btn .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.auth-btn.loading .spinner{display:block}
+.auth-btn.loading .btn-text{opacity:0;position:absolute}
+@keyframes spin{to{transform:rotate(360deg)}}
+.auth-err{
+  display:none;padding:10px 14px;border-radius:9px;
+  background:rgba(224,80,112,.09);border:1px solid rgba(224,80,112,.25);
+  color:var(--er);font-size:.8rem;margin-bottom:12px;line-height:1.5;
+}
+.auth-err.show{display:block}
+.auth-ok{
+  display:none;padding:10px 14px;border-radius:9px;
+  background:rgba(46,188,138,.09);border:1px solid rgba(46,188,138,.25);
+  color:var(--ok);font-size:.8rem;margin-bottom:12px;line-height:1.5;
+}
+.auth-ok.show{display:block}
+.auth-footer-link{text-align:center;margin-top:14px;font-size:.76rem;color:var(--tq)}
+.auth-footer-link a{color:var(--pk-l);cursor:pointer;text-decoration:none;font-weight:600}
+.auth-footer-link a:hover{text-decoration:underline}
+/* Social divider */
+.or-divider{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:.72rem;color:var(--tq)}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:rgba(212,98,122,.13)}
+/* Navbar user pill */
+.user-pill{
+  display:flex;align-items:center;gap:7px;padding:5px 11px;
+  border-radius:100px;background:var(--pk-pale);
+  border:1px solid var(--br);cursor:pointer;transition:var(--t);
+  font-size:.78rem;font-weight:600;color:var(--pk-l);
+}
+.user-pill:hover{background:var(--card-h);border-color:var(--br-h)}
+.user-av{
+  width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pk),var(--pk-d));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.68rem;font-weight:800;color:#fff;flex-shrink:0;
+}
+.login-btn{
+  padding:5px 14px;border-radius:100px;
+  background:linear-gradient(135deg,var(--pk),var(--pk-d));
+  color:#fff;font-size:.78rem;font-weight:700;
+  border:none;cursor:pointer;font-family:'Inter',sans-serif;
+  transition:var(--t);letter-spacing:.03em;
+}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(212,98,122,.35)}
+/* User dropdown */
+.user-dropdown{
+  position:absolute;top:58px;right:18px;
+  background:linear-gradient(160deg,#1e0d14,#120808);
+  border:1px solid var(--br-h);border-radius:14px;
+  padding:8px;min-width:200px;z-index:999;
+  display:none;box-shadow:0 12px 40px rgba(0,0,0,.5);
+}
+.user-dropdown.open{display:block}
+.ud-header{padding:10px 12px 8px;border-bottom:1px solid var(--br);margin-bottom:4px}
+.ud-email{font-size:.75rem;color:var(--tq);word-break:break-all}
+.ud-name{font-size:.88rem;font-weight:700;color:var(--tx);margin-bottom:2px;font-family:'Noto Serif JP',serif}
+.ud-xp{font-size:.72rem;color:var(--gold);margin-top:3px}
+.ud-item{
+  display:flex;align-items:center;gap:9px;padding:9px 12px;
+  border-radius:9px;cursor:pointer;transition:var(--t);
+  font-size:.84rem;color:var(--tm);font-family:'Inter',sans-serif;
+}
+.ud-item:hover{background:var(--card-h);color:var(--tx)}
+.ud-item.danger{color:var(--er)}
+.ud-item.danger:hover{background:rgba(224,80,112,.08)}
+/* Setup guide card */
+.setup-guide{
+  background:linear-gradient(135deg,rgba(201,153,58,.07),rgba(212,98,122,.05));
+  border:1px solid rgba(201,153,58,.2);border-radius:var(--rl);
+  padding:20px 22px;margin:18px 0;
+}
+.sg-title{font-family:'Noto Serif JP',serif;font-size:1rem;font-weight:700;color:var(--gold-l);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sg-step{display:flex;gap:10px;font-size:.82rem;color:var(--tm);margin-bottom:8px;line-height:1.6}
+.sg-num{width:22px;height:22px;border-radius:50%;background:rgba(201,153,58,.15);border:1px solid rgba(201,153,58,.3);color:var(--gold);font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.sg-code{
+  background:rgba(0,0,0,.35);border:1px solid rgba(212,98,122,.15);
+  border-radius:8px;padding:10px 13px;font-family:monospace;
+  font-size:.76rem;color:var(--pk-l);margin:8px 0;
+  white-space:pre-wrap;word-break:break-all;line-height:1.6;
+}
 </style>
 </head>
 <body>
@@ -596,10 +737,13 @@ footer{
     <div class="logo" onclick="goHome()">
       <span class="logo-blossom">🌸</span>LinguaAI
     </div>
-    <div class="nav-pills">
-      <div class="npill s">🔥<span id="nStr">1</span></div>
-      <div class="npill x">⚡<span id="nXP">0</span></div>
-      <div class="npill h">❤️<span id="nH">5</span></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="nav-pills">
+        <div class="npill s">🔥<span id="nStr">1</span></div>
+        <div class="npill x">⚡<span id="nXP">0</span></div>
+        <div class="npill h">❤️<span id="nH">5</span></div>
+      </div>
+      <div id="navAuthZone"></div>
     </div>
   </div>
 </nav>
@@ -620,6 +764,41 @@ footer{
       <div class="ss"><span class="ss-v">Free</span><div class="ss-l">to Start</div></div>
     </div>
     <div class="ad-slot">📢 AdSense — add your ca-pub-ID in &lt;head&gt; for revenue</div>
+    
+<!-- Supabase setup guide (hidden once configured) -->
+<div class="setup-guide" id="setupGuide" style="display:none">
+  <div class="sg-title">🔧 Connect Your Database (one-time setup)</div>
+  <div class="sg-step"><div class="sg-num">1</div><div>Go to <a href="https://supabase.com" target="_blank" style="color:var(--pk-l)">supabase.com</a> → New project → choose a name + region</div></div>
+  <div class="sg-step"><div class="sg-num">2</div><div>In <b>SQL Editor</b>, paste and run this to create the user progress table:</div></div>
+  <div class="sg-code">create table profiles (
+  id uuid references auth.users primary key,
+  email text,
+  display_name text default 'Learner',
+  xp int default 0,
+  streak int default 1,
+  last_day text default '',
+  done jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+alter table profiles enable row level security;
+create policy "Users manage own profile"
+  on profiles for all using (auth.uid() = id)
+  with check (auth.uid() = id);
+create or replace function handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email)
+  values (new.id, new.email);
+  return new;
+end;
+$$ language plpgsql security definer;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure handle_new_user();</div>
+  <div class="sg-step"><div class="sg-num">3</div><div>Go to <b>Project Settings → API</b> — copy your <b>Project URL</b> and <b>anon public key</b></div></div>
+  <div class="sg-step"><div class="sg-num">4</div><div>Open the <code style="color:var(--pk-l)">&lt;script&gt;</code> section in <b>index.html</b> and fill in <code style="color:var(--pk-l)">SUPA_URL</code> and <code style="color:var(--pk-l)">SUPA_KEY</code></div></div>
+</div>
+
     <div class="sec-divider"><span>Choose a Language</span></div>
     <div class="lang-grid" id="langGrid"></div>
     <div class="ad-slot">📢 Advertisement slot</div>
@@ -1682,6 +1861,390 @@ loadState();
 bumpStreak();
 updateNav();
 renderHome();
+</script>
+
+<!-- ══ AUTH MODAL ══ -->
+<div class="auth-modal-ov" id="authModal">
+  <div class="auth-box">
+    <div class="auth-header">
+      <span class="auth-crest">🌸</span>
+      <div class="auth-title">Welcome to LinguaAI</div>
+      <div class="auth-sub">Sign in to save your progress across all devices</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</button>
+        <button class="auth-tab" onclick="switchAuthTab('signup')">Create Account</button>
+      </div>
+    </div>
+    <div class="auth-body">
+
+      <!-- SIGN IN -->
+      <div class="auth-panel active" id="panel-signin">
+        <div class="auth-err" id="si-err"></div>
+        <div class="auth-ok"  id="si-ok"></div>
+        <div class="auth-field">
+          <label class="auth-label">Email Address</label>
+          <input class="auth-input" id="si-email" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Password</label>
+          <input class="auth-input" id="si-pass" type="password" placeholder="Your password" autocomplete="current-password">
+        </div>
+        <div style="text-align:right;margin:-6px 0 12px">
+          <a onclick="showReset()" style="font-size:.75rem;color:var(--pk-l);cursor:pointer;font-family:Inter,sans-serif">Forgot password?</a>
+        </div>
+        <button class="auth-btn" id="si-btn" onclick="doSignIn()">
+          <div class="spinner"></div>
+          <span class="btn-text">Sign In 🌸</span>
+        </button>
+        <div class="auth-footer-link">Don't have an account? <a onclick="switchAuthTab('signup')">Create one</a></div>
+        <div class="auth-divider"></div>
+        <button class="auth-btn" onclick="closeAuthModal()" style="background:transparent;border:1px solid var(--br-h);color:var(--tq);margin-top:0">Continue without account</button>
+      </div>
+
+      <!-- SIGN UP -->
+      <div class="auth-panel" id="panel-signup">
+        <div class="auth-err" id="su-err"></div>
+        <div class="auth-ok"  id="su-ok"></div>
+        <div class="auth-field">
+          <label class="auth-label">Display Name</label>
+          <input class="auth-input" id="su-name" type="text" placeholder="Your name" autocomplete="name">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Email Address</label>
+          <input class="auth-input" id="su-email" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Password</label>
+          <input class="auth-input" id="su-pass" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
+          <div class="auth-hint">Use at least 6 characters. Your progress will be saved automatically.</div>
+        </div>
+        <button class="auth-btn" id="su-btn" onclick="doSignUp()">
+          <div class="spinner"></div>
+          <span class="btn-text">Create Account 🌸</span>
+        </button>
+        <div class="auth-footer-link">Already have an account? <a onclick="switchAuthTab('signin')">Sign in</a></div>
+        <div class="auth-divider"></div>
+        <button class="auth-btn" onclick="closeAuthModal()" style="background:transparent;border:1px solid var(--br-h);color:var(--tq);margin-top:0">Continue without account</button>
+      </div>
+
+      <!-- RESET PASSWORD -->
+      <div class="auth-panel" id="panel-reset">
+        <div class="auth-err" id="rs-err"></div>
+        <div class="auth-ok"  id="rs-ok"></div>
+        <div class="auth-field">
+          <label class="auth-label">Your Email Address</label>
+          <input class="auth-input" id="rs-email" type="email" placeholder="you@example.com">
+          <div class="auth-hint">We'll send you a reset link.</div>
+        </div>
+        <button class="auth-btn" id="rs-btn" onclick="doReset()">
+          <div class="spinner"></div>
+          <span class="btn-text">Send Reset Link</span>
+        </button>
+        <div class="auth-footer-link"><a onclick="switchAuthTab('signin')">← Back to Sign In</a></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- User dropdown -->
+<div class="user-dropdown" id="userDropdown">
+  <div class="ud-header">
+    <div class="ud-name" id="ud-name">Learner</div>
+    <div class="ud-email" id="ud-email"></div>
+    <div class="ud-xp" id="ud-xp">⚡ 0 XP total</div>
+  </div>
+  <div class="ud-item" onclick="goHome();closeDropdown()">🏠 Home</div>
+  <div class="ud-item" onclick="closeDropdown();openPrem()">🌸 Upgrade to Pro</div>
+  <div class="ud-item danger" onclick="doSignOut()">🚪 Sign Out</div>
+</div>
+
+<script>
+
+/* ══════════════════════════════════════
+   SUPABASE CONFIG
+   → Get these from supabase.com → Project Settings → API
+══════════════════════════════════════ */
+const SUPA_URL = 'https://YOUR_PROJECT.supabase.co';   // ← paste your Project URL
+const SUPA_KEY = 'YOUR_ANON_KEY';                       // ← paste your anon/public key
+const SUPA_CONFIGURED = !SUPA_URL.includes('YOUR_PROJECT');
+
+/* ── Supabase REST helpers ── */
+async function supaFetch(endpoint, opts){
+  if(!SUPA_CONFIGURED) return null;
+  opts = opts || {};
+  opts.headers = Object.assign({
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer '+(AUTH.session ? AUTH.session.access_token : SUPA_KEY),
+    'Content-Type': 'application/json',
+    'Prefer': opts.prefer || ''
+  }, opts.headers || {});
+  delete opts.prefer;
+  try{
+    const r = await fetch(SUPA_URL+'/rest/v1'+endpoint, opts);
+    if(!r.ok){
+      const e = await r.json().catch(()=>({}));
+      throw new Error(e.message || r.statusText);
+    }
+    const text = await r.text();
+    return text ? JSON.parse(text) : null;
+  }catch(e){ console.error('Supabase fetch error:', e); return null; }
+}
+
+async function supaAuth(action, body){
+  if(!SUPA_CONFIGURED) return {error:'Not configured'};
+  try{
+    const r = await fetch(SUPA_URL+'/auth/v1/'+action, {
+      method:'POST',
+      headers:{ 'apikey':SUPA_KEY, 'Content-Type':'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    if(!r.ok) return { error: data.error_description || data.msg || data.message || 'Error' };
+    return data;
+  }catch(e){ return { error: e.message }; }
+}
+
+/* ── Auth State ── */
+const AUTH = { user:null, session:null };
+
+function getStoredSession(){
+  try{ return JSON.parse(localStorage.getItem('la_session')||'null'); }catch(_){ return null; }
+}
+function storeSession(s){
+  if(s) localStorage.setItem('la_session', JSON.stringify(s));
+  else  localStorage.removeItem('la_session');
+}
+
+async function initAuth(){
+  if(!SUPA_CONFIGURED){
+    document.getElementById('setupGuide').style.display = 'block';
+    renderNavAuth();
+    return;
+  }
+  const stored = getStoredSession();
+  if(stored && stored.access_token){
+    // Verify token still valid
+    try{
+      const r = await fetch(SUPA_URL+'/auth/v1/user', {
+        headers:{ 'apikey':SUPA_KEY, 'Authorization':'Bearer '+stored.access_token }
+      });
+      if(r.ok){
+        const user = await r.json();
+        AUTH.user = user; AUTH.session = stored;
+        await loadCloudProgress();
+        renderNavAuth();
+        return;
+      }
+    }catch(_){}
+    storeSession(null);
+  }
+  renderNavAuth();
+  // Show auth modal on first visit (after small delay)
+  if(!localStorage.getItem('la_shown_auth')){
+    setTimeout(()=>{ openAuthModal(); localStorage.setItem('la_shown_auth','1'); }, 1200);
+  }
+}
+
+async function loadCloudProgress(){
+  if(!AUTH.user) return;
+  const rows = await supaFetch('/profiles?id=eq.'+AUTH.user.id+'&select=xp,streak,last_day,done');
+  if(rows && rows[0]){
+    const p = rows[0];
+    ST.xp      = p.xp || 0;
+    ST.streak  = p.streak || 1;
+    ST.lastDay = p.last_day || '';
+    try{ if(p.done) ST.done = JSON.parse(typeof p.done==='string'?p.done:JSON.stringify(p.done)); }catch(_){}
+    updateNav();
+  }
+}
+
+async function saveCloudProgress(){
+  if(!AUTH.user || !SUPA_CONFIGURED) return;
+  await supaFetch('/profiles?id=eq.'+AUTH.user.id, {
+    method:'PATCH',
+    prefer:'return=minimal',
+    body: JSON.stringify({
+      xp: ST.xp,
+      streak: ST.streak,
+      last_day: ST.lastDay,
+      done: ST.done
+    })
+  });
+}
+
+/* ── Render navbar auth zone ── */
+function renderNavAuth(){
+  const zone = document.getElementById('navAuthZone');
+  if(!zone) return;
+  if(AUTH.user){
+    const initial = (AUTH.user.user_metadata && AUTH.user.user_metadata.display_name)
+      ? AUTH.user.user_metadata.display_name.charAt(0).toUpperCase()
+      : AUTH.user.email.charAt(0).toUpperCase();
+    const name = (AUTH.user.user_metadata && AUTH.user.user_metadata.display_name)
+      ? AUTH.user.user_metadata.display_name
+      : AUTH.user.email.split('@')[0];
+    zone.innerHTML =
+      '<div class="user-pill" onclick="toggleDropdown()">'+
+        '<div class="user-av">'+initial+'</div>'+
+        '<span>'+name+'</span>'+
+        '<span style="font-size:.65rem;color:var(--tq)">▾</span>'+
+      '</div>';
+    // Update dropdown
+    document.getElementById('ud-name').textContent = name;
+    document.getElementById('ud-email').textContent = AUTH.user.email;
+    document.getElementById('ud-xp').textContent = '⚡ '+ST.xp+' XP';
+  } else {
+    zone.innerHTML = '<button class="login-btn" onclick="openAuthModal()">Sign In 🌸</button>';
+  }
+}
+
+function toggleDropdown(){
+  const d = document.getElementById('userDropdown');
+  d.classList.toggle('open');
+}
+function closeDropdown(){
+  document.getElementById('userDropdown').classList.remove('open');
+}
+
+/* ── Auth Modal ── */
+function openAuthModal(){ document.getElementById('authModal').classList.add('open'); }
+function closeAuthModal(){ document.getElementById('authModal').classList.remove('open'); }
+
+function switchAuthTab(tab){
+  document.querySelectorAll('.auth-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.auth-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.auth-tab')[tab==='signin'?0:1].classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+  clearAuthMessages();
+}
+function showReset(){
+  document.querySelectorAll('.auth-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.auth-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('panel-reset').classList.add('active');
+}
+function clearAuthMessages(){
+  ['si-err','si-ok','su-err','su-ok','rs-err','rs-ok'].forEach(function(id){
+    const el=document.getElementById(id);
+    if(el){ el.classList.remove('show'); el.textContent=''; }
+  });
+}
+function showMsg(id, msg){
+  const el=document.getElementById(id);
+  if(el){ el.textContent=msg; el.classList.add('show'); }
+}
+function setBtnLoading(id, loading){
+  const btn = document.getElementById(id);
+  if(!btn) return;
+  if(loading){ btn.classList.add('loading'); btn.disabled=true; }
+  else        { btn.classList.remove('loading'); btn.disabled=false; }
+}
+
+async function doSignIn(){
+  const email = document.getElementById('si-email').value.trim();
+  const pass  = document.getElementById('si-pass').value;
+  if(!email||!pass){ showMsg('si-err','Please fill in all fields.'); return; }
+  setBtnLoading('si-btn',true); clearAuthMessages();
+  const data = await supaAuth('token?grant_type=password', { email, password:pass });
+  setBtnLoading('si-btn',false);
+  if(data.error){ showMsg('si-err', data.error); return; }
+  AUTH.user    = data.user;
+  AUTH.session = data;
+  storeSession(data);
+  await loadCloudProgress();
+  renderNavAuth();
+  closeAuthModal();
+  showToast('Welcome back, '+((data.user.user_metadata&&data.user.user_metadata.display_name)||data.user.email.split('@')[0])+'! 🌸','ok');
+}
+
+async function doSignUp(){
+  const name  = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const pass  = document.getElementById('su-pass').value;
+  if(!email||!pass){ showMsg('su-err','Please fill in all fields.'); return; }
+  if(pass.length < 6){ showMsg('su-err','Password must be at least 6 characters.'); return; }
+  setBtnLoading('su-btn',true); clearAuthMessages();
+  const data = await supaAuth('signup', {
+    email, password: pass,
+    data: { display_name: name||email.split('@')[0] }
+  });
+  setBtnLoading('su-btn',false);
+  if(data.error){ showMsg('su-err', data.error); return; }
+  if(data.user && !data.session){
+    // Email confirmation required
+    showMsg('su-ok','✅ Check your email to confirm your account, then sign in!');
+    setTimeout(()=> switchAuthTab('signin'), 3000);
+    return;
+  }
+  AUTH.user    = data.user;
+  AUTH.session = data;
+  storeSession(data);
+  renderNavAuth();
+  closeAuthModal();
+  showToast('Account created! Welcome to LinguaAI 🌸','ok');
+}
+
+async function doReset(){
+  const email = document.getElementById('rs-email').value.trim();
+  if(!email){ showMsg('rs-err','Please enter your email.'); return; }
+  setBtnLoading('rs-btn',true); clearAuthMessages();
+  try{
+    await fetch(SUPA_URL+'/auth/v1/recover', {
+      method:'POST',
+      headers:{ 'apikey':SUPA_KEY, 'Content-Type':'application/json' },
+      body: JSON.stringify({ email })
+    });
+    showMsg('rs-ok','✅ Reset email sent! Check your inbox.');
+  }catch(e){ showMsg('rs-err', e.message); }
+  setBtnLoading('rs-btn',false);
+}
+
+async function doSignOut(){
+  closeDropdown();
+  if(AUTH.session){
+    try{
+      await fetch(SUPA_URL+'/auth/v1/logout', {
+        method:'POST',
+        headers:{ 'apikey':SUPA_KEY, 'Authorization':'Bearer '+AUTH.session.access_token }
+      });
+    }catch(_){}
+  }
+  AUTH.user = null; AUTH.session = null;
+  storeSession(null);
+  renderNavAuth();
+  showToast('Signed out. See you soon! 🌸','inf');
+}
+
+/* ── Override save to also sync cloud ── */
+const _origSave = saveState;
+function saveState(){
+  _origSave();
+  saveCloudProgress();
+}
+
+/* ── Close dropdown on outside click ── */
+document.addEventListener('click', function(e){
+  const dd  = document.getElementById('userDropdown');
+  const zone= document.getElementById('navAuthZone');
+  if(dd && !dd.contains(e.target) && zone && !zone.contains(e.target)){
+    dd.classList.remove('open');
+  }
+  const am = document.getElementById('authModal');
+  if(am && e.target===am) closeAuthModal();
+});
+
+/* key: Enter in sign-in inputs */
+['si-email','si-pass'].forEach(function(id){
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('keydown',function(e){ if(e.key==='Enter') doSignIn(); });
+});
+['su-email','su-pass','su-name'].forEach(function(id){
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('keydown',function(e){ if(e.key==='Enter') doSignUp(); });
+});
+
+// Init auth after main boot
+initAuth();
 </script>
 </body>
 </html>
