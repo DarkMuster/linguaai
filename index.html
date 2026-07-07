@@ -1448,10 +1448,16 @@ function renderEx(){
   document.getElementById('pFill').style.width = (ST.idx/ST.ex.length*100)+'%';
   renderHearts();
   document.getElementById('fbBar').className = 'fb-bar';
-  document.getElementById('chkBtn').style.display = 'block';
-  document.getElementById('chkBtn').disabled = true;
-  document.getElementById('contBtn').style.display = 'none';
-  ST.sel=null; ST.mLeft=null; ST.mMatched=[]; ST.mPairs=null; ST.answered=false;
+  var chkEl = document.getElementById('chkBtn');
+  var contEl = document.getElementById('contBtn');
+  chkEl.style.display = 'block';
+  chkEl.disabled = true;
+  contEl.style.display = 'none';
+  // Re-bind check button cleanly
+  var freshChk = chkEl.cloneNode(true);
+  freshChk.addEventListener('click', checkAns);
+  chkEl.parentNode.replaceChild(freshChk, chkEl);
+  ST.sel=null; ST.mLeft=null; ST.mMatched=[]; ST.mPairs=null; ST.answered=false; ST._advancing=false;
 
   const b = document.getElementById('lBody');
 
@@ -1464,8 +1470,11 @@ function renderEx(){
       '<div class="ex-divider"></div>'+
       '<div class="ex-en">'+e.en+'</div>';
     document.getElementById('chkBtn').style.display = 'none';
-    const cb = document.getElementById('contBtn');
+    var cb = document.getElementById('contBtn');
     cb.style.display='block'; cb.textContent='Got it! →';
+    var freshCb = cb.cloneNode(true);
+    freshCb.addEventListener('click', function(){ advance(); });
+    cb.parentNode.replaceChild(freshCb, cb);
     return;
   }
   if(e.t==='choice') renderChoice(e,b);
@@ -1586,8 +1595,10 @@ function checkAns(){
   if(ST.answered) return;
   const e = ST.ex[ST.idx];
 
-  if(e.t==='intro'){ nextEx(); return; }
+  // Intro slides — just advance (called when "Got it!" clicked via contBtn)
+  if(e.t==='intro'){ advance(); return; }
 
+  // Match — only fires once all pairs completed (sel='__ok__')
   if(e.t==='match'){
     if(ST.sel==='__ok__'){
       ST.answered = true;
@@ -1598,42 +1609,72 @@ function checkAns(){
     return;
   }
 
-  const ok = ST.sel === e.ans;
+  // Choice / Fill
+  if(ST.sel === null) return;                 // nothing selected yet
+  const ok = (ST.sel.trim() === e.ans.trim());
   ST.answered = true;
 
   if(ok){
     ST.lXP += 10;
     showFB(true,'🌸 Correct!','');
     popXP();
-    if(e.t==='choice') document.querySelectorAll('.cBtn').forEach(function(b){ if(b.dataset.val===e.ans) b.classList.add('ok'); });
-    if(e.t==='fill')   document.querySelectorAll('.fOpt').forEach(function(b){ if(b.textContent.trim()===e.ans) b.classList.add('ok'); });
+    if(e.t==='choice'){
+      document.querySelectorAll('.cBtn').forEach(function(b){
+        if(b.dataset.val === e.ans) b.classList.add('ok');
+      });
+    }
+    if(e.t==='fill'){
+      document.querySelectorAll('.fOpt').forEach(function(b){
+        if(b.textContent.trim() === e.ans.trim()) b.classList.add('ok');
+      });
+    }
   } else {
     ST.lWrong++;
     loseHeart();
-    showFB(false,'✗ Not quite','Correct answer: '+e.ans);
-    if(e.t==='choice') document.querySelectorAll('.cBtn').forEach(function(b){
-      if(b.dataset.val===e.ans) b.classList.add('ok');
-      else if(b.classList.contains('sel')) b.classList.add('bad');
-    });
-    if(e.t==='fill') document.querySelectorAll('.fOpt').forEach(function(b){
-      if(b.textContent.trim()===e.ans) b.classList.add('ok');
-      else if(b.classList.contains('sel')) b.classList.add('bad');
-    });
+    showFB(false,'✗ Not quite','Correct: '+e.ans);
+    if(e.t==='choice'){
+      document.querySelectorAll('.cBtn').forEach(function(b){
+        if(b.dataset.val === e.ans)              b.classList.add('ok');
+        else if(b.classList.contains('sel'))     b.classList.add('bad');
+      });
+    }
+    if(e.t==='fill'){
+      document.querySelectorAll('.fOpt').forEach(function(b){
+        if(b.textContent.trim() === e.ans.trim()) b.classList.add('ok');
+        else if(b.classList.contains('sel'))      b.classList.add('bad');
+      });
+    }
   }
   showContinue();
 }
 
 function showContinue(){
-  document.getElementById('chkBtn').style.display='none';
-  const c = document.getElementById('contBtn');
-  c.style.display='block'; c.textContent='Continue →';
+  var chk  = document.getElementById('chkBtn');
+  var cont = document.getElementById('contBtn');
+  chk.style.display  = 'none';
+  cont.style.display = 'block';
+  cont.textContent   = 'Continue →';
+  // Re-attach click handler cleanly (removes old one via clone trick)
+  var fresh = cont.cloneNode(true);
+  fresh.addEventListener('click', function(){ advance(); });
+  cont.parentNode.replaceChild(fresh, cont);
 }
 
-function nextEx(){
+function advance(){
+  // Prevent double-advance
+  if(ST._advancing) return;
+  ST._advancing = true;
   ST.idx++;
-  if(ST.idx >= ST.ex.length) finishLesson();
-  else renderEx();
+  var done = (ST.idx >= ST.ex.length);
+  // Small delay so feedback is visible before screen wipe
+  setTimeout(function(){
+    ST._advancing = false;
+    if(done) finishLesson();
+    else     renderEx();
+  }, done ? 0 : 80);
 }
+
+function nextEx(){ advance(); }   // kept for HTML onclick compat
 
 function showFB(ok,main,ans){
   const bar = document.getElementById('fbBar');
@@ -1684,6 +1725,7 @@ function finishLesson(){
   ST.xp += ST.lXP;
   bumpStreak();
   saveState();
+  if(typeof saveCloudProgress==='function') saveCloudProgress();
   updateNav();
 
   const L = DB[p.lid];
@@ -1965,8 +2007,8 @@ renderHome();
    SUPABASE CONFIG
    → Get these from supabase.com → Project Settings → API
 ══════════════════════════════════════ */
-const SUPA_URL = 'https://tkrwwarwrkqmammvmyym.supabase.co';   // ← paste your Project URL
-const SUPA_KEY = 'sb_publishable_9z8dSZ60OoJwzZNPxDWrMQ_qcKt6xum';  // ← paste your anon/public key
+const SUPA_URL = 'https://tkrwwarwrkqmammvmyym.supabase.co';
+const SUPA_KEY = 'sb_publishable_9z8dSZ6BOoJwzZNPxDWrMQ_qcKt6xum';
 const SUPA_CONFIGURED = !SUPA_URL.includes('YOUR_PROJECT');
 
 /* ── Supabase REST helpers ── */
@@ -2215,12 +2257,7 @@ async function doSignOut(){
   showToast('Signed out. See you soon! 🌸','inf');
 }
 
-/* ── Override save to also sync cloud ── */
-const _origSave = saveState;
-function saveState(){
-  _origSave();
-  saveCloudProgress();
-}
+/* ── Cloud sync on save (hoisting-safe) ── */
 
 /* ── Close dropdown on outside click ── */
 document.addEventListener('click', function(e){
