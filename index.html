@@ -701,6 +701,25 @@ footer{
   font-size:.76rem;color:var(--pk-l);margin:8px 0;
   white-space:pre-wrap;word-break:break-all;line-height:1.6;
 }
+
+/* JLPT level tabs */
+.lvl-tab[data-lv="N5"] .lvl-dot{background:var(--n5)}
+.lvl-tab[data-lv="N4"] .lvl-dot{background:var(--n4)}
+.lvl-tab[data-lv="N3"] .lvl-dot{background:var(--n3)}
+.lvl-tab[data-lv="N2"] .lvl-dot{background:var(--n2)}
+.lvl-tab[data-lv="N1"] .lvl-dot{background:var(--n1)}
+.lvl-tab[data-lv="N5"].active{background:var(--n5);border-color:var(--n5);box-shadow:0 0 14px rgba(46,188,138,.35)}
+.lvl-tab[data-lv="N4"].active{background:var(--n4);border-color:var(--n4);box-shadow:0 0 14px rgba(37,144,184,.35)}
+.lvl-tab[data-lv="N3"].active{background:var(--n3);border-color:var(--n3);box-shadow:0 0 14px rgba(123,108,246,.4)}
+.lvl-tab[data-lv="N2"].active{background:var(--n2);border-color:var(--n2);box-shadow:0 0 14px rgba(212,98,122,.4)}
+.lvl-tab[data-lv="N1"].active{background:var(--n1);border-color:var(--n1);color:#fff;box-shadow:0 0 16px rgba(139,0,0,.55)}
+/* Exam badge on map header */
+.exam-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:100px;font-size:.68rem;font-weight:700;
+  background:rgba(212,98,122,.1);border:1px solid rgba(212,98,122,.22);
+  color:var(--pk-l);letter-spacing:.05em;text-transform:uppercase;margin-top:4px;
+}
 </style>
 </head>
 <body>
@@ -867,7 +886,7 @@ create trigger on_auth_user_created
 
 const DB={
 ja:{flag:'🇯🇵',name:'Japanese',native:'日本語',levels:[
-  {id:'A1',lbl:'Beginner',free:true,units:[
+  {id:'N5',lbl:'Beginner',exam:'JLPT N5',color:'#2EBC8A',free:true,units:[
     {title:'Greetings',icon:'🌸',lessons:[
       {title:'Hello & Goodbye',icon:'👋',xp:15,ex:[
         {t:'intro',word:'こんにちは',nat:'Konnichiwa',pron:'/kon·ni·chi·wa/',en:'Hello (daytime)'},
@@ -925,7 +944,7 @@ ja:{flag:'🇯🇵',name:'Japanese',native:'日本語',levels:[
       ]},
     ]},
   ]},
-  {id:'A2',lbl:'Elementary',free:false,units:[
+  {id:'N4',lbl:'Elementary',exam:'JLPT N4',color:'#2590B8',free:false,units:[
     {title:'Food & Restaurants',icon:'🍱',lessons:[
       {title:'Ordering Food',icon:'🍜',xp:20,ex:[
         {t:'intro',word:'〜をひとつください',nat:'~wo hitotsu kudasai',pron:'',en:'One ~ please'},
@@ -951,13 +970,12 @@ ja:{flag:'🇯🇵',name:'Japanese',native:'日本語',levels:[
       ]},
     ]},
   ]},
-  {id:'B1',lbl:'Intermediate',free:false,comingSoon:true,units:[]},
-  {id:'B2',lbl:'Upper-Int.',free:false,comingSoon:true,units:[]},
-  {id:'C1',lbl:'Advanced',free:false,comingSoon:true,units:[]},
-  {id:'C2',lbl:'Mastery',free:false,comingSoon:true,units:[]},
+  {id:'N3',lbl:'Intermediate',exam:'JLPT N3',color:'#7B6CF6',free:false,comingSoon:true,units:[]},
+  {id:'N2',lbl:'Upper-Int.',exam:'JLPT N2',color:'#D4627A',free:false,comingSoon:true,units:[]},
+  {id:'N1',lbl:'Advanced',exam:'JLPT N1',color:'#8B0000',free:false,comingSoon:true,units:[]},
 ]},
 de:{flag:'🇩🇪',name:'German',native:'Deutsch',levels:[
-  {id:'A1',lbl:'Beginner',free:true,units:[
+  {id:'A1',lbl:'Beginner',exam:'Goethe A1',color:'#2EBC8A',free:true,units:[
     {title:'Greetings',icon:'🦅',lessons:[
       {title:'Hello & Goodbye',icon:'👋',xp:15,ex:[
         {t:'intro',word:'Hallo',nat:'Hallo',pron:'/ˈhaloː/',en:'Hello'},
@@ -1003,7 +1021,7 @@ de:{flag:'🇩🇪',name:'German',native:'Deutsch',levels:[
       ]},
     ]},
   ]},
-  {id:'A2',lbl:'Elementary',free:false,units:[
+  {id:'A2',lbl:'Elementary',exam:'Goethe A2',color:'#2590B8',free:false,units:[
     {title:'Past Tense',icon:'⏪',lessons:[
       {title:'Perfekt Tense',icon:'✅',xp:25,ex:[
         {t:'intro',word:'haben + Partizip II',nat:'haben + past participle',pron:'',en:'Most verbs: haben + -ge...-t'},
@@ -1017,13 +1035,13 @@ de:{flag:'🇩🇪',name:'German',native:'Deutsch',levels:[
       ]},
     ]},
   ]},
-  {id:'B1',lbl:'Intermediate',free:false,comingSoon:true,units:[]},
-  {id:'B2',lbl:'Upper-Int.',free:false,comingSoon:true,units:[]},
-  {id:'C1',lbl:'Advanced',free:false,comingSoon:true,units:[]},
-  {id:'C2',lbl:'Mastery',free:false,comingSoon:true,units:[]},
+  {id:'B1',lbl:'Intermediate',exam:'Goethe B1',color:'#7B6CF6',free:false,comingSoon:true,units:[]},
+  {id:'B2',lbl:'Upper-Int.',exam:'Goethe B2',color:'#A83EA0',free:false,comingSoon:true,units:[]},
+  {id:'C1',lbl:'Advanced',exam:'Goethe C1',color:'#C9993A',free:false,comingSoon:true,units:[]},
+  {id:'C2',lbl:'Mastery',exam:'Goethe C2',color:'#D04040',free:false,comingSoon:true,units:[]},
 ]},
 es:{flag:'🇪🇸',name:'Spanish',native:'Español',levels:[
-  {id:'A1',lbl:'Beginner',free:true,units:[
+  {id:'A1',lbl:'Beginner',exam:'DELE A1',color:'#2EBC8A',free:true,units:[
     {title:'Basics',icon:'🌞',lessons:[
       {title:'Greetings',icon:'👋',xp:15,ex:[
         {t:'match',q:'Spanish greetings',pairs:[{l:'Hola',r:'Hello'},{l:'Buenos días',r:'Good morning'},{l:'Buenas tardes',r:'Good afternoon'},{l:'Buenas noches',r:'Good night'}]},
@@ -1057,7 +1075,7 @@ es:{flag:'🇪🇸',name:'Spanish',native:'Español',levels:[
       ]},
     ]},
   ]},
-  {id:'A2',lbl:'Elementary',free:false,units:[
+  {id:'A2',lbl:'Elementary',exam:'Goethe A2',color:'#2590B8',free:false,units:[
     {title:'Past Tense',icon:'⏪',lessons:[
       {title:'Preterite',icon:'⏪',xp:25,ex:[
         {t:'match',q:'hablar preterite',pairs:[{l:'yo hablé',r:'I spoke'},{l:'tú hablaste',r:'you spoke'},{l:'él habló',r:'he spoke'},{l:'nosotros hablamos',r:'we spoke'}]},
@@ -1071,13 +1089,13 @@ es:{flag:'🇪🇸',name:'Spanish',native:'Español',levels:[
       ]},
     ]},
   ]},
-  {id:'B1',lbl:'Intermediate',free:false,comingSoon:true,units:[]},
-  {id:'B2',lbl:'Upper-Int.',free:false,comingSoon:true,units:[]},
-  {id:'C1',lbl:'Advanced',free:false,comingSoon:true,units:[]},
-  {id:'C2',lbl:'Mastery',free:false,comingSoon:true,units:[]},
+  {id:'B1',lbl:'Intermediate',exam:'DELE B1',color:'#7B6CF6',free:false,comingSoon:true,units:[]},
+  {id:'B2',lbl:'Upper-Int.',exam:'DELE B2',color:'#A83EA0',free:false,comingSoon:true,units:[]},
+  {id:'C1',lbl:'Advanced',exam:'DELE C1',color:'#C9993A',free:false,comingSoon:true,units:[]},
+  {id:'C2',lbl:'Mastery',exam:'DELE C2',color:'#D04040',free:false,comingSoon:true,units:[]},
 ]},
 fr:{flag:'🇫🇷',name:'French',native:'Français',levels:[
-  {id:'A1',lbl:'Beginner',free:true,units:[
+  {id:'A1',lbl:'Beginner',exam:'DELF A1',color:'#2EBC8A',free:true,units:[
     {title:'Basics',icon:'🥐',lessons:[
       {title:'Greetings',icon:'👋',xp:15,ex:[
         {t:'match',q:'French greetings',pairs:[{l:'Bonjour',r:'Hello/Good day'},{l:'Bonsoir',r:'Good evening'},{l:'Au revoir',r:'Goodbye'},{l:'Bonne nuit',r:'Good night'}]},
@@ -1101,14 +1119,14 @@ fr:{flag:'🇫🇷',name:'French',native:'Français',levels:[
       ]},
     ]},
   ]},
-  {id:'A2',lbl:'Elementary',free:false,comingSoon:true,units:[]},
-  {id:'B1',lbl:'Intermediate',free:false,comingSoon:true,units:[]},
-  {id:'B2',lbl:'Upper-Int.',free:false,comingSoon:true,units:[]},
-  {id:'C1',lbl:'Advanced',free:false,comingSoon:true,units:[]},
-  {id:'C2',lbl:'Mastery',free:false,comingSoon:true,units:[]},
+  {id:'A2',lbl:'Elementary',exam:'DELF A2',color:'#2590B8',free:false,comingSoon:true,units:[]},
+  {id:'B1',lbl:'Intermediate',exam:'DELF B1',color:'#7B6CF6',free:false,comingSoon:true,units:[]},
+  {id:'B2',lbl:'Upper-Int.',exam:'DALF B2',color:'#A83EA0',free:false,comingSoon:true,units:[]},
+  {id:'C1',lbl:'Advanced',exam:'DALF C1',color:'#C9993A',free:false,comingSoon:true,units:[]},
+  {id:'C2',lbl:'Mastery',exam:'DALF C2',color:'#D04040',free:false,comingSoon:true,units:[]},
 ]},
 ru:{flag:'🇷🇺',name:'Russian',native:'Русский',levels:[
-  {id:'A1',lbl:'Beginner',free:true,units:[
+  {id:'A1',lbl:'Beginner',exam:'TORFL A1',color:'#2EBC8A',free:true,units:[
     {title:'Alphabet & Basics',icon:'📚',lessons:[
       {title:'Cyrillic Alphabet',icon:'🔤',xp:20,ex:[
         {t:'intro',word:'А Б В Г Д',nat:'A B V G D',pron:'',en:'Russian has 33 Cyrillic letters'},
@@ -1142,14 +1160,14 @@ ru:{flag:'🇷🇺',name:'Russian',native:'Русский',levels:[
       ]},
     ]},
   ]},
-  {id:'A2',lbl:'Elementary',free:false,comingSoon:true,units:[]},
-  {id:'B1',lbl:'Intermediate',free:false,comingSoon:true,units:[]},
-  {id:'B2',lbl:'Upper-Int.',free:false,comingSoon:true,units:[]},
-  {id:'C1',lbl:'Advanced',free:false,comingSoon:true,units:[]},
-  {id:'C2',lbl:'Mastery',free:false,comingSoon:true,units:[]},
+  {id:'A2',lbl:'Elementary',exam:'TORFL A2',color:'#2590B8',free:false,comingSoon:true,units:[]},
+  {id:'B1',lbl:'Intermediate',exam:'TORFL B1',color:'#7B6CF6',free:false,comingSoon:true,units:[]},
+  {id:'B2',lbl:'Upper-Int.',exam:'TORFL B2',color:'#A83EA0',free:false,comingSoon:true,units:[]},
+  {id:'C1',lbl:'Advanced',exam:'TORFL C1',color:'#C9993A',free:false,comingSoon:true,units:[]},
+  {id:'C2',lbl:'Mastery',exam:'TORFL C2',color:'#D04040',free:false,comingSoon:true,units:[]},
 ]},
 ar:{flag:'🇸🇦',name:'Arabic',native:'العربية',levels:[
-  {id:'A1',lbl:'Beginner',free:true,units:[
+  {id:'A1',lbl:'Beginner',exam:'CEFR A1',color:'#2EBC8A',free:true,units:[
     {title:'Script & Greetings',icon:'🌙',lessons:[
       {title:'Script Basics',icon:'✍️',xp:20,ex:[
         {t:'intro',word:'Arabic reads right to left ←',nat:'من اليمين إلى اليسار',pron:'',en:'Arabic is written right-to-left, 28 letters'},
@@ -1183,14 +1201,14 @@ ar:{flag:'🇸🇦',name:'Arabic',native:'العربية',levels:[
       ]},
     ]},
   ]},
-  {id:'A2',lbl:'Elementary',free:false,comingSoon:true,units:[]},
-  {id:'B1',lbl:'Intermediate',free:false,comingSoon:true,units:[]},
-  {id:'B2',lbl:'Upper-Int.',free:false,comingSoon:true,units:[]},
-  {id:'C1',lbl:'Advanced',free:false,comingSoon:true,units:[]},
-  {id:'C2',lbl:'Mastery',free:false,comingSoon:true,units:[]},
+  {id:'A2',lbl:'Elementary',exam:'CEFR A2',color:'#2590B8',free:false,comingSoon:true,units:[]},
+  {id:'B1',lbl:'Intermediate',exam:'CEFR B1',color:'#7B6CF6',free:false,comingSoon:true,units:[]},
+  {id:'B2',lbl:'Upper-Int.',exam:'CEFR B2',color:'#A83EA0',free:false,comingSoon:true,units:[]},
+  {id:'C1',lbl:'Advanced',exam:'CEFR C1',color:'#C9993A',free:false,comingSoon:true,units:[]},
+  {id:'C2',lbl:'Mastery',exam:'CEFR C2',color:'#D04040',free:false,comingSoon:true,units:[]},
 ]},
 en:{flag:'🇺🇸',name:'English',native:'For non-natives',levels:[
-  {id:'A1',lbl:'Beginner',free:true,units:[
+  {id:'A1',lbl:'Beginner',exam:'Cambridge A1',color:'#2EBC8A',free:true,units:[
     {title:'Foundations',icon:'🗽',lessons:[
       {title:'Greetings',icon:'👋',xp:15,ex:[
         {t:'match',q:'Formality levels',pairs:[{l:'Hey!',r:'Very informal'},{l:'Hi',r:'Informal'},{l:'Hello',r:'Neutral'},{l:'Good morning',r:'Formal'}]},
@@ -1224,11 +1242,11 @@ en:{flag:'🇺🇸',name:'English',native:'For non-natives',levels:[
       ]},
     ]},
   ]},
-  {id:'A2',lbl:'Elementary',free:false,comingSoon:true,units:[]},
-  {id:'B1',lbl:'Intermediate',free:false,comingSoon:true,units:[]},
-  {id:'B2',lbl:'Upper-Int.',free:false,comingSoon:true,units:[]},
-  {id:'C1',lbl:'Advanced',free:false,comingSoon:true,units:[]},
-  {id:'C2',lbl:'Mastery',free:false,comingSoon:true,units:[]},
+  {id:'A2',lbl:'Elementary',exam:'Cambridge A2',color:'#2590B8',free:false,comingSoon:true,units:[]},
+  {id:'B1',lbl:'Intermediate',exam:'Cambridge B1',color:'#7B6CF6',free:false,comingSoon:true,units:[]},
+  {id:'B2',lbl:'Upper-Int.',exam:'Cambridge B2',color:'#A83EA0',free:false,comingSoon:true,units:[]},
+  {id:'C1',lbl:'Advanced',exam:'Cambridge C1',color:'#C9993A',free:false,comingSoon:true,units:[]},
+  {id:'C2',lbl:'Mastery',exam:'Cambridge C2',color:'#D04040',free:false,comingSoon:true,units:[]},
 ]},
 };
 
@@ -1333,9 +1351,20 @@ function openMap(langId){
   let dn=0;
   for(const k in ST.done){ if(k.indexOf(langId+'_')===0) dn++; }
 
+  // Build level system label (e.g. "JLPT" for Japanese, "CEFR" for others)
+  var examLabel = 'CEFR';
+  if(L.levels[0] && L.levels[0].exam){
+    var firstExam = L.levels[0].exam;
+    examLabel = firstExam.replace(/ [A-Z][0-9]+$/,'').replace(/ N[0-9]+$/,'').replace(/[0-9]+$/,'').trim();
+  }
+  var numLevels = L.levels.length;
   document.getElementById('mapHdr').innerHTML =
     '<div class="mlh-flag">'+L.flag+'</div>'+
-    '<div class="mlh-info"><h2>'+L.name+'</h2><p>'+L.native+' · '+L.levels.length+' CEFR levels</p></div>'+
+    '<div class="mlh-info">'+
+      '<h2>'+L.name+'</h2>'+
+      '<p>'+L.native+'</p>'+
+      '<span class="exam-badge">'+examLabel+' · '+numLevels+' levels</span>'+
+    '</div>'+
     '<div class="mlh-xp"><div class="mlh-xpv">'+(dn*15)+'</div><div class="mlh-xpl">XP earned</div></div>';
 
   renderLevelTabs(langId);
@@ -1350,9 +1379,14 @@ function renderLevelTabs(langId){
     const locked = !lv.free && !ST.isPremium;
     const cls = 'lvl-tab'+(i===0?' active':'')+(locked?' locked':'');
     const click = locked ? 'openPrem()' : ("selectLevel('"+langId+"','"+lv.id+"',this)");
+    const col = lv.color || '#2EBC8A';
+    const label = lv.exam || lv.id;
     html.push(
-      '<button class="'+cls+'" data-lv="'+lv.id+'" onclick="'+click+'">'+
-        '<span class="lvl-dot"></span>'+lv.id+(locked?' 🔒':'')+
+      '<button class="'+cls+'" data-lv="'+lv.id+'"'+
+        ' style="'+(i===0?'background:'+col+';border-color:'+col+';color:#fff;':'')+'"'+
+        ' onclick="'+click+'">'+
+        '<span class="lvl-dot" style="background:'+col+'"></span>'+
+        label+(locked?' 🔒':'')+
       '</button>'
     );
   });
@@ -1361,9 +1395,21 @@ function renderLevelTabs(langId){
 }
 
 function selectLevel(langId,lvlId,el){
-  const all = document.querySelectorAll('.lvl-tab');
-  all.forEach(function(t){ t.classList.remove('active'); });
+  const L = DB[langId];
+  const lv = L.levels.filter(function(x){ return x.id===lvlId; })[0];
+  const col = lv ? (lv.color||'#2EBC8A') : '#2EBC8A';
+  // Reset all tabs
+  document.querySelectorAll('.lvl-tab').forEach(function(t){
+    t.classList.remove('active');
+    t.style.background = '';
+    t.style.borderColor = '';
+    t.style.color = '';
+  });
+  // Activate clicked tab with level's own color
   el.classList.add('active');
+  el.style.background   = col;
+  el.style.borderColor  = col;
+  el.style.color        = '#fff';
   renderSkillPath(langId,lvlId);
 }
 
@@ -1376,11 +1422,12 @@ function renderSkillPath(langId,lvlId){
   if(!lv){ path.innerHTML=''; return; }
 
   if(lv.comingSoon || !lv.units || lv.units.length===0){
+    var examName = lv.exam || (lv.id+' — '+lv.lbl);
     path.innerHTML =
       '<div class="coming-soon">'+
         '<span class="cs-emoji">🚧</span>'+
-        '<div class="cs-title">Level '+lv.id+' — '+lv.lbl+'</div>'+
-        '<p class="cs-desc">This level is being crafted by our team.<br>Upgrade to Pro to get early access when it launches.</p>'+
+        '<div class="cs-title">'+examName+'</div>'+
+        '<p class="cs-desc">'+lv.lbl+' level content is coming soon.<br>Upgrade to Pro for early access when it launches.</p>'+
         '<button class="cs-btn" onclick="openPrem()">🌸 Upgrade to Pro</button>'+
       '</div>';
     return;
